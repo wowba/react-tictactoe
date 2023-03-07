@@ -5,10 +5,26 @@ import "./Board.css"
 // 클래스형 컴포넌트, ES7 익스텐션 설치시 rcc 로 작성 가능 
 export default class Board extends React.Component {
 
+  constructor(props) {
+    super(props)
+    this.state = {
+      squares: Array(9).fill(null),
+    }
+  }
+
+  handleClick(num) {
+    const squares = this.state.squares.slice()
+    squares[num] = "X"
+    this.setState({ squares: squares})
+  }
+
   renderSquare(num) {
     return (
       // 아래와 같이 리액트에서는 properties를 넘겨줄 수 있다.
-      <Square props={num}/>
+      <Square 
+        value={this.state.squares[num]}
+        onClick={() => this.handleClick(num)}
+      />
     )
   }
 
