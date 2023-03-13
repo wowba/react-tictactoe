@@ -1,53 +1,85 @@
-import React from "react"
+import React, {useState} from "react"
 import Square from "./Square"
 import "./Board.css"
 
-// 클래스형 컴포넌트, ES7 익스텐션 설치시 rcc 로 작성 가능 
-export default class Board extends React.Component {
+const Board = () => {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      squares: Array(9).fill(null),
+  const [squares, setSquares] = useState(Array(9).fill(null))
+  const [isFirstPlayer, setIsFirstPlayer] = useState(true)
+
+  const handleClick = (num) => {
+    const newSquares = squares.slice()
+
+    if(calculateWinner(newSquares) || newSquares[num]) {
+      return;
     }
+
+    newSquares[num] = isFirstPlayer ? "X" : "O"
+    setIsFirstPlayer(prev => !prev)
+    setSquares(newSquares)
   }
 
-  handleClick(num) {
-    const squares = this.state.squares.slice()
-    squares[num] = "X"
-    this.setState({ squares: squares})
-  }
-
-  renderSquare(num) {
+  const renderSquare = (num) => {
     return (
       // 아래와 같이 리액트에서는 properties를 넘겨줄 수 있다.
       <Square 
-        value={this.state.squares[num]}
-        onClick={() => this.handleClick(num)}
+        value={squares[num]}
+        onClick={() => handleClick(num)}
       />
     )
   }
 
-  render() {
-    return (
-      <div>
-        <div className="status">Next Player</div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
-    )
+  const calculateWinner = (squares) => {
+    const lines = [
+      [0,1,2],
+      [3,4,5],
+      [6,7,8],
+      [0,3,6],
+      [1,4,7],
+      [2,5,8],
+      [0,4,8],
+      [2,4,6]
+    ]
+    for (let i = 0; i < lines.length; i++) {
+      const [a,b,c] = lines[i]
+      if (squares[a] 
+        && squares[a] === squares[b] 
+        && squares[a] === squares[c]
+      ) {
+        return squares[a]
+      }
+    }
+    return null
   }
+
+  const winner = calculateWinner(squares)
+  let status;
+  if (winner) {
+    status = 'winner:' + winner
+  } else {
+    status = `Next player : ${isFirstPlayer? "X" : "O"}`
+  }
+
+  return (
+    <div>
+      <div className="status">{status}</div>
+      <div className="board-row">
+        {renderSquare(0)}
+        {renderSquare(1)}
+        {renderSquare(2)}
+      </div>
+      <div className="board-row">
+        {renderSquare(3)}
+        {renderSquare(4)}
+        {renderSquare(5)}
+      </div>
+      <div className="board-row">
+        {renderSquare(6)}
+        {renderSquare(7)}
+        {renderSquare(8)}
+      </div>
+    </div>
+  )
 }
+
+export default Board
